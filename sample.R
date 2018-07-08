@@ -9,6 +9,7 @@ getwd()
 setwd('/Users/krao/Dropbox/2018 Applied Bioinformatics Work/Personal Folders/Kevin Rao')
 
 data <- read.csv('sample.csv')
+colnames(data)
 #View(data)
 
 trimMilk <- select(data, skim, milk, ca, cadur, cad)
