@@ -375,24 +375,8 @@ lapply(c(1,2,3,4,5), function(num){ num * 2 })
 
 #fuck it im just going to only take columns that have values 0-9
 
-ffqData <- data[, 42:174]
-blank <- c('dairypt', 'fruitpt', 'vegpt', 'eggspt', 'meatspt', 'breadspt', 'bevpt', 'sweetspt', 'otherspt', 'fatfpt', 
-                                    'fatbpt', 'oilpt', 'mpt', 'sugpt', 'cerpt', 'fl', 'cer', 'oil')
-ffqData <- ffqData[ , -which(names(ffqData) %in% blank)]
-
-ffqData[ffqData == 1] <- 1/60
-ffqData[ffqData == 2] <- 1/15
-ffqData[ffqData == 3] <- 1/7
-ffqData[ffqData == 4] <- 3/7
-ffqData[ffqData == 5] <- 5.5/7
-ffqData[ffqData == 6] <- 1
-ffqData[ffqData == 7] <- 2.5
-ffqData[ffqData == 8] <- 4.5
-ffqData[ffqData == 9] <- 7
-ffqData[ffqData == 10] <- NA
-
+ffqData <- transformFFQ(data)
 head(ffqData)
-
 
 #kmeans on the ffq data
 
@@ -405,6 +389,7 @@ pcasffq4c <- kmeansAndPca(complete_ffq, colnames(complete_ffq), TRUE, 4)
 #looks kind of interesting lets look at the scores
  
 cont <- as.data.frame(pcaContribution(pcauffq4c))
+View(cont)
 cont <- cont[order(-cont$Comp.1), ]
 head(cont)
 cont <- cont[order(-cont$Comp.2), ]

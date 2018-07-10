@@ -60,8 +60,10 @@ colnames(md)
 md <- md[order(md$ID), ]
 #View(md$ID)
 
-dataWithId <- filter(data, !is.na(data$id))
-#View(dataWithId$id)
+ffqData <- transformFFQ(data)
+dataWithId <- filter(ffqData, !is.na(ffqData$ID))
+#View(dataWithId$ID)
+colnames(dataWithId)
 
 md <- filter(md, nchar(ID) == 6)
 #View(md$ID)
@@ -69,20 +71,14 @@ md <- filter(md, nchar(ID) == 6)
 md <- mutate(md, numID = strtoi(substr(ID, 3, 6), base = 10))
 #View(select(md, ID, numID))
 
-md <- left_join(md, data, by = c('numID' = 'id'))
+md <- left_join(md, dataWithId, by = c('numID' = 'ID'))
 colnames(md)
 #confirm that the match is correct somehow
 
 #View(select(md, ID, numID))
 
 #View(md[which(md$numID == 4), ])
-md <- mutate(md, AGE = AGE8.x+0)
-grep('AGE', colnames(md))
-colnames(md)
-View(md$AGE)
-md$AGE8.x <- md$AGE8.y <- NULL
-grep('AGE', colnames(md))
-
+md <- md[order(md$ID), ]
 
 
 ?setwd

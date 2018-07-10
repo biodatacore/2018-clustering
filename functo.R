@@ -76,8 +76,31 @@ pcaContribution <- function(pca){
   load <- with(pca, unclass(loadings))
   aload <- abs(load)
   a <- sweep(aload, 2, colSums(aload), "/")
-  a[, 1:min(4, length(a[1]))]
+  a[, 1 : min(4, length(a[1,]))]
 }
+
+#this function only takes the raw framingham ffq data as an argument
+transformFFQ <- function(data){
+  ffqData <- data[, 42:174]
+  blank <- c('dairypt', 'fruitpt', 'vegpt', 'eggspt', 'meatspt', 'breadspt', 'bevpt', 'sweetspt', 'otherspt', 'fatfpt', 
+             'fatbpt', 'oilpt', 'mpt', 'sugpt', 'cerpt', 'fl', 'cer', 'oil')
+  ffqData <- ffqData[ , -which(names(ffqData) %in% blank)]
+  
+  ffqData[ffqData == 1] <- 1/60
+  ffqData[ffqData == 2] <- 1/15
+  ffqData[ffqData == 3] <- 1/7
+  ffqData[ffqData == 4] <- 3/7
+  ffqData[ffqData == 5] <- 5.5/7
+  ffqData[ffqData == 6] <- 1
+  ffqData[ffqData == 7] <- 2.5
+  ffqData[ffqData == 8] <- 4.5
+  ffqData[ffqData == 9] <- 7
+  ffqData[ffqData == 10] <- NA
+  
+  ffqData$ID = data$id
+  ffqData
+}
+
 
 
 ?min
