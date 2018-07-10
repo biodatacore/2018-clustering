@@ -101,7 +101,12 @@ transformFFQ <- function(data){
   ffqData
 }
 
-
+tryClust <- function(method, cut){
+  clusters <- hclust(dist(scale(eicOnly)), method = method);
+  plot(clusters);
+  clustercut <- cutree(clusters, cut);
+  table(clustercut)
+}
 
 ?min
 ?length
