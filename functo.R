@@ -76,7 +76,8 @@ pcaContribution <- function(pca){
   load <- with(pca, unclass(loadings))
   aload <- abs(load)
   a <- sweep(aload, 2, colSums(aload), "/")
-  a[, 1 : min(4, length(a[1,]))]
+  a <- as.data.frame(a[, 1 : min(4, length(a[1,]))])
+  a[order(-a$Comp.1), ]
 }
 
 #this function only takes the raw framingham ffq data as an argument

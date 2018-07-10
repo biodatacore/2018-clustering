@@ -20,8 +20,8 @@ temp <- pairCors[order(-pairCors)]
 
 head(temp)
 
-
 skrrrahh(16)
 
 ?cor
 ?order
+?kmeans
