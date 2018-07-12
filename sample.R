@@ -75,10 +75,10 @@ ggplot(data = trimSpinach) +
 classDiet <- select(data, skim, milk, cream, eggs, CHIX_SK, CHIX_NO, bacon, hotdog, PROC_MTS, liver, hamb, SAND_BF, beef, tuna, DK_FISH, OTH_FISH, shrimp)
 classDiet <- data
 
-classDiet <- addClassCol(classDiet, 'Dairy', c('skim', 'milk', 'cream'))
-classDiet <- addClassCol(classDiet, 'Ovo', c('eggs'))
-classDiet <- addClassCol(classDiet, 'Fish', c('tuna', 'DK_FISH', 'OTH_FISH', 'shrimp'))
-classDiet <- addClassCol(classDiet, 'Meat', c('CHIX_SK', 'CHIX_NO', 'bacon', 'hotdog', 'PROC_MTS', 'liver', 'hamb', 'SAND_BF', 'beef'))
+classDiet <- addClassCol(classDiet, 'Dairy', c('skim', 'milk', 'cream'), FALSE)
+classDiet <- addClassCol(classDiet, 'Ovo', c('eggs'), FALSE)
+classDiet <- addClassCol(classDiet, 'Fish', c('tuna', 'DK_FISH', 'OTH_FISH', 'shrimp'), FALSE)
+classDiet <- addClassCol(classDiet, 'Meat', c('CHIX_SK', 'CHIX_NO', 'bacon', 'hotdog', 'PROC_MTS', 'liver', 'hamb', 'SAND_BF', 'beef'), FALSE)
 
 classDiet <- mutate(classDiet, classification = (Dairy == 'Normal') + (Ovo == 'Normal') * 2 + (Fish == 'Normal') * 4 + (Meat == 'Normal') * 8)
 
@@ -320,10 +320,10 @@ notUsing <- nutAndClass[, which(names(nutAndClass) %in% c('type'))]
 using <- as.data.frame(scale(using))
 
 cluster <- runKmeans(using, colnames(using), 4)
-nutClassGrp <- mutate(nutAndClass, grp = factor(cluster$cluster))
+#nutClassGrp <- mutate(nutAndClass, grp = factor(cluster$cluster))
 
 grpPCA <- princomp(using)
-pcaTable <- mutate(as.data.frame(grpPCA$scores), grp = nutClassGrp$grp, type = nutClassGrp$type)
+pcaTable <- mutate(as.data.frame(grpPCA$scores), grp = factor(cluster$cluster), type = nutAndClass$type)
 
 a <- ggplot(data = pcaTable) +
   geom_point(mapping = aes(x = Comp.1, y = Comp.2, color = grp, shape = type))

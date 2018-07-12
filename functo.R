@@ -59,10 +59,10 @@ vs_Class <- function(colName){
     geom_boxplot(mapping = aes_string(x = 'classification', y = colName))
 }
 
-addClassCol <- function(data, colName, critList){
+addClassCol <- function(data, colName, critList, transformed = FALSE){
   temp <- TRUE
   for(i in critList){
-    temp <- temp & data[[i]]<=2
+    temp <- temp & data[[i]]<= ifelse(transformed, .1, 2)
   }
   data[[colName]] <- ifelse(temp, 'Low', 'Normal')
   data
