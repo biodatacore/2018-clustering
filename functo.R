@@ -83,9 +83,12 @@ pcaContribution <- function(pca){
 #this function only takes the raw framingham ffq data as an argument
 transformFFQ <- function(data){
   ffqData <- data[, 42:174]
+  ffqData <- unfactor(ffqData)
   blank <- c('dairypt', 'fruitpt', 'vegpt', 'eggspt', 'meatspt', 'breadspt', 'bevpt', 'sweetspt', 'otherspt', 'fatfpt', 
              'fatbpt', 'oilpt', 'mpt', 'sugpt', 'cerpt', 'fl', 'cer', 'oil')
   ffqData <- ffqData[ , -which(names(ffqData) %in% blank)]
+  
+  print(ffqData$tofu)
   
   ffqData[ffqData == 1] <- 1/60
   ffqData[ffqData == 2] <- 1/15
@@ -97,6 +100,8 @@ transformFFQ <- function(data){
   ffqData[ffqData == 8] <- 4.5
   ffqData[ffqData == 9] <- 7
   ffqData[ffqData == 10] <- NA
+  
+  print(ffqData$tofu)
   
   ffqData$ID = data$id
   ffqData

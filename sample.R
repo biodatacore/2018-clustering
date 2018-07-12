@@ -4,6 +4,7 @@ library(factoextra)
 #library(cluster)
 library(tibble)
 library(gridExtra)
+library(varhandle)
 
 getwd()
 setwd('/Users/krao/Dropbox/2018 Applied Bioinformatics Work/Personal Folders/Kevin Rao')
@@ -141,19 +142,19 @@ nutrientData <- filter(nutrientData, complete.cases(nutrientData))
 pcaunut4c <- kmeansAndPca(nutrientData, colnames(nutrientData), FALSE, 4)
 #pca$loadings
 
-fviz_eig(pca)
-summary(pca)
-load <- with(pca, unclass(loadings))
-aload <-
-  pca %>%
-  with(unclass(loadings)) %>%
-  abs
-proportions <- as.data.frame(as.matrix(sweep(aload, 2, colSums(aload), "/")))
-eigs <- pca$sdev^2
-rbind(
-  SD = sqrt(eigs),
-  Proportion = eigs[1]/sum(eigs),
-  Cumulative = cumsum(eigs)/sum(eigs))
+# fviz_eig(pca)
+# summary(pca)
+# load <- with(pca, unclass(loadings))
+# aload <-
+#   pca %>%
+#   with(unclass(loadings)) %>%
+#   abs
+# proportions <- as.data.frame(as.matrix(sweep(aload, 2, colSums(aload), "/")))
+# eigs <- pca$sdev^2
+# rbind(
+#   SD = sqrt(eigs),
+#   Proportion = eigs[1]/sum(eigs),
+#   Cumulative = cumsum(eigs)/sum(eigs))
 
 
 
@@ -161,12 +162,12 @@ rbind(
 #k means with nutrientdata scaled
 pcasnut4c <- kmeansAndPca(nutrientData, colnames(nutrientData), TRUE, 4)
 
-summary(pcale)
-eigs <- pcale$sdev^2
-rbind(
-  SD = sqrt(eigs),
-  Proportion = eigs/sum(eigs),
-  Cumulative = cumsum(eigs)/sum(eigs))
+# summary(pcale)
+# eigs <- pcale$sdev^2
+# rbind(
+#   SD = sqrt(eigs),
+#   Proportion = eigs/sum(eigs),
+#   Cumulative = cumsum(eigs)/sum(eigs))
 
 
 
@@ -177,12 +178,12 @@ noCal$totcal <- NULL
 
 pcaunoCal4c <- kmeansAndPca(noCal, colnames(noCal), FALSE, 4)
 
-summary(pNoCal)
-eigs <- pNoCal$sdev^2
-rbind(
-  SD = sqrt(eigs),
-  Proportion = eigs/sum(eigs),
-  Cumulative = cumsum(eigs)/sum(eigs))
+# summary(pNoCal)
+# eigs <- pNoCal$sdev^2
+# rbind(
+#   SD = sqrt(eigs),
+#   Proportion = eigs/sum(eigs),
+#   Cumulative = cumsum(eigs)/sum(eigs))
 
 #kmeans removing cal and scaling
 
@@ -191,12 +192,12 @@ noCal$totcal <- NULL
 
 pcasnoCal4c <- kmeansAndPca(noCal, colnames(noCal), TRUE, 4)
 
-summary(pcale)
-eigs <- pcale$sdev^2
-rbind(
-  SD = sqrt(eigs),
-  Proportion = eigs/sum(eigs),
-  Cumulative = cumsum(eigs)/sum(eigs))
+# summary(pcale)
+# eigs <- pcale$sdev^2
+# rbind(
+#   SD = sqrt(eigs),
+#   Proportion = eigs/sum(eigs),
+#   Cumulative = cumsum(eigs)/sum(eigs))
 
 
 
@@ -258,16 +259,16 @@ filter(d2, value > .9 & value != 1)
 kmeansAndPca(noCorData, colnames(noCorData), FALSE, 4)
 kmeansAndPca(noCorData, colnames(noCorData), TRUE, 4)
 
-summary(pca)
-eigs <- pca$sdev^2
-rbind(
-  SD = sqrt(eigs),
-  Proportion = eigs/sum(eigs),
-  Cumulative = cumsum(eigs)/sum(eigs))
-
-load <- with(pca, unclass(loadings))
-aload <- abs(load)
-proportions <- as.data.frame(as.matrix(sweep(aload, 2, colSums(aload), "/")))
+# summary(pca)
+# eigs <- pca$sdev^2
+# rbind(
+#   SD = sqrt(eigs),
+#   Proportion = eigs/sum(eigs),
+#   Cumulative = cumsum(eigs)/sum(eigs))
+# 
+# load <- with(pca, unclass(loadings))
+# aload <- abs(load)
+# proportions <- as.data.frame(as.matrix(sweep(aload, 2, colSums(aload), "/")))
 
 
 
@@ -285,6 +286,9 @@ table(clustercut)
 correlation <- as.data.frame(cor(noCorData, method = "spearman"))
 correlation
 kmeansAndPca(correlation, colnames(correlation), FALSE, 4)
+
+#turns out clustering on correlation lends some interesting clustering but interpretability is ass
+
 
 #divisive hierarchical
 
@@ -321,8 +325,6 @@ nutClassGrp <- mutate(nutAndClass, grp = factor(cluster$cluster))
 grpPCA <- princomp(using)
 pcaTable <- mutate(as.data.frame(grpPCA$scores), grp = nutClassGrp$grp, type = nutClassGrp$type)
 
-kmeansAndPca(nutAndClass, colnames(nutAndClass), FALSE, 4)
-
 a <- ggplot(data = pcaTable) +
   geom_point(mapping = aes(x = Comp.1, y = Comp.2, color = grp, shape = type))
 
@@ -352,44 +354,34 @@ ggplot(data = data) +
 
 #grep('skim', colnames(data))
 #grep('S_SHAKE', colnames(data))
-ffqData <- data[, 42:198]
-head(ffqData)
-blank <- c('dairypt', 'fruitpt', 'vegpt', 'eggspt', 'meatspt', 'breadspt', 'bevpt', 'sweetspt', 'otherspt', 'fatfpt', 
-           'fatbpt', 'oilpt', 'mpt', 'sugpt', 'cerpt', 'fl', 'cer', 'oil')
-ffqData <- ffqData[ , -which(names(ffqData) %in% blank)]
-head(ffqData)
-
-servings <- colnames(ffqData)[1:126]
-
-head(ffqData)
-temp <- lapply(ffqData, ffqToDaily)
-temp <- as.data.frame(sapply(as.matrix(ffqData), ffqToDaily))
-View(temp)
-
-sapply(matrix(c(1,2,3,4,5,6,7,8,9), ncol = 3), function(num){num * 2})
-
-lapply(c(1,2,3,4,5), function(num){ num * 2 })
 
 #these columns arent the simple ffqToDaily: 'vf', 'ffh', 'ffa', 'sugar', 'oil
 #these columns are booleans 'fb', 'fm', 'fvo', 'fsh', 'bb', 'bm', 'bvo', 'bsh', 'bl', 'mn', 'ms', 'mls', 'mt', 'msp', mlt'
 
 #fuck it im just going to only take columns that have values 0-9
 
+
+
 ffqData <- transformFFQ(data)
 head(ffqData)
 
+
 #kmeans on the ffq data
+
+View(ffqData$tofu)
 
 complete_ffq <- filter(ffqData, complete.cases(ffqData))
 
-pcauffq4c <- kmeansAndPca(complete_ffq, colnames(complete_ffq), FALSE, 4)
-pcasffq4c <- kmeansAndPca(complete_ffq, colnames(complete_ffq), TRUE, 4)
+colnames(complete_ffq)
+
+pcauffq4c <- kmeansAndPca(complete_ffq, colnames(complete_ffq)[colnames(complete_ffq) != 'ID'], FALSE, 4)
+pcasffq4c <- kmeansAndPca(complete_ffq, colnames(complete_ffq)[colnames(complete_ffq) != 'ID'], TRUE, 4)
 
 
 #looks kind of interesting lets look at the scores
  
 cont <- as.data.frame(pcaContribution(pcauffq4c))
-View(cont)
+#View(cont)
 cont <- cont[order(-cont$Comp.1), ]
 head(cont)
 cont <- cont[order(-cont$Comp.2), ]
@@ -409,7 +401,7 @@ table(clustercut)
 
 #yea hierarchical is still fucked, clustering on nonscaled with complete method is the least uninteresting
 
-pcaContribution(kmeansAndPca(complete_ffq, c('P_SHAKE', 'S_SHAKE', 'coff'), FALSE, 4))
+pcaContribution(kmeansAndPca(complete_ffq, c('P_SHAKE', 'S_SHAKE', 'coff'), TRUE, 4))
 
 
 

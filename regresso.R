@@ -27,10 +27,11 @@ ggplot(data = md) +
   geom_point(mapping = aes(x = mzid_445.227362_3.4312, y = beer))
 
 ggplot(data = md) +
-  geom_point(mapping = aes(x = mzid_327.217613_4.0425, y = mzid_329.232478_3.9113))
+  geom_point(mapping = aes(x = log(mzid_327.217613_4.0425), y = log(mzid_329.232478_3.9113)))
 
 skrrrahh(16)
 
 ?cor
 ?order
+?log
 ?kmeans
