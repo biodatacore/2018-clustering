@@ -368,7 +368,7 @@ head(ffqData)
 
 #kmeans on the ffq data
 
-View(ffqData$tofu)
+#View(ffqData$tofu)
 
 complete_ffq <- filter(ffqData, complete.cases(ffqData))
 

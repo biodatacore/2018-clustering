@@ -2,17 +2,19 @@ colnames(md)
 grep('points', colnames(md))
 grep('numID', colnames(md))
 
-eicOnly <- select(md, 12:534)
+eicOnly <- 12:534
 
-pcauEicOnly4c <- kmeansAndPca(eicOnly, colnames(eicOnly), FALSE, 4)
-pcasEicOnly5c <- kmeansAndPca(eicOnly, colnames(eicOnly), TRUE, 5)
+pcauEicOnly4c <- kmeansAndPca(md[eicOnly], colnames(md)[eicOnly], FALSE, 4)
+pcasEicOnly5c <- kmeansAndPca(md[eicOnly], colnames(md)[eicOnly], TRUE, 5)
+
+pcauEicOnly4c
 
 temp <- pcaContribution(pcasEicOnly5c)
 head(temp)
 temp <- temp[order(-temp$Comp.2), ]
 head(temp)
 
-pcaAndKmeans(eicOnly, colnames(eicOnly), FALSE, 5)
+pcaAndKmeans(md[eicOnly], colnames(md[eicOnly]), FALSE, 5)
 
 tryClust('complete', 20)
 tryClust('single', 20)
@@ -31,10 +33,13 @@ forDiet <- mutate(forDiet, classification = (Dairy == 'Normal') + (Ovo == 'Norma
 
 forDiet <- mutate(forDiet, type = ifelse(classification <= 1, 'vegan', ifelse(classification < 8, 'vegetarian', 'omnivore')))
 
+View(d)
 
-cluster <- runKmeans(eicOnly, colnames(eicOnly), 4)
+cluster <- runKmeans(forDiet[eicOnly], colnames(forDiet)[eicOnly], 4)
+cluster$cluster
 
 grpPCA <- princomp(eicOnly)
+View(grpPCA$scores)
 pcaTable <- mutate(as.data.frame(grpPCA$scores), grp = factor(cluster$cluster), type = forDiet$type)
 
 a <- ggplot(data = pcaTable) +
@@ -49,3 +54,23 @@ ggplot(data = vfocused) +
 
 grid.arrange(a, b, ncol = 2)
 
+
+#try plotting and coloring by nuts
+
+theseNuts <- as.data.frame(pcauEicOnly4c$scores)
+theseNuts <- mutate(theseNuts, nuts = forDiet$nuts, grp = cluster$cluster)
+View(cluster$cluster)
+
+
+ggplot(data = theseNuts) +
+  geom_point(mapping = aes(x = Comp.1, y = Comp.2, color = factor(nuts)))
+
+
+temp <- filter(ffqData, complete.cases(ffqData))
+cluster <- runKmeans(temp, colnames(temp), 3)
+pca <- princomp(temp)
+View(temp)
+View(pca$scores)
+View(cluster$cluster)
+tbl <- mutate(as.data.frame(pca$scores), grp = factor(cluster$cluster))
+?kmeans
