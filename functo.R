@@ -60,11 +60,13 @@ vs_Class <- function(colName){
 }
 
 addClassCol <- function(data, colName, critList, transformed = FALSE){
-  temp <- TRUE
+  low <- TRUE
+  allNorm <- TRUE
   for(i in critList){
-    temp <- temp & data[[i]]<= ifelse(transformed, .1, 2)
+    low <- low & data[[i]] <= ifelse(transformed, .1, 2)
+    allNorm <- allNorm & data[[i]] <= ifelse(transformed, 2.5 , 7)
   }
-  data[[colName]] <- ifelse(temp, 'Low', 'Normal')
+  data[[colName]] <- ifelse(low, 'Low', ifelse(allNorm, 'Normal', 'High'))
   data
 }
 

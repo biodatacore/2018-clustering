@@ -3,6 +3,7 @@ grep('points', colnames(md))
 grep('numID', colnames(md))
 
 eicOnly <- 12:534
+dietOnly <- 536:661
 
 pcauEicOnly4c <- kmeansAndPca(md[eicOnly], colnames(md)[eicOnly], FALSE, 4)
 pcasEicOnly5c <- kmeansAndPca(md[eicOnly], colnames(md)[eicOnly], TRUE, 5)
@@ -28,18 +29,19 @@ forDiet <- addClassCol(forDiet, 'Dairy', c('skim', 'milk', 'cream'), TRUE)
 forDiet <- addClassCol(forDiet, 'Ovo', c('eggs'), TRUE)
 forDiet <- addClassCol(forDiet, 'Fish', c('tuna', 'DK_FISH', 'OTH_FISH', 'shrimp'), TRUE)
 forDiet <- addClassCol(forDiet, 'Meat', c('CHIX_SK', 'CHIX_NO', 'bacon', 'hotdog', 'PROC_MTS', 'liver', 'hamb', 'SAND_BF', 'beef'), TRUE)
+forDiet <- addClassCol(forDiet, 'RedMeat', c('bacon', 'hotdog', 'PROC_MTS', 'liver', 'hamb', 'SAND_BF', 'beef'), TRUE)
 
-forDiet <- mutate(forDiet, classification = (Dairy == 'Normal') + (Ovo == 'Normal') * 2 + (Fish == 'Normal') * 4 + (Meat == 'Normal') * 8)
+forDiet <- mutate(forDiet, classification = (Dairy != 'Low') + (Ovo != 'Low') * 2 + (Fish != 'Low') * 4 + (Meat != 'Low') * 8)
 
 forDiet <- mutate(forDiet, type = ifelse(classification <= 1, 'vegan', ifelse(classification < 8, 'vegetarian', 'omnivore')))
 
-View(d)
 
-cluster <- runKmeans(forDiet[eicOnly], colnames(forDiet)[eicOnly], 4)
-cluster$cluster
+eicCluster <- runKmeans(forDiet[eicOnly], colnames(forDiet)[eicOnly], 4)
+complete.cases(forDiet[eicOnly])
+dietCluster <- runKmeans(forDiet[dietOnly], colnames(forDiet)[dietOnly], 4)
 
-grpPCA <- princomp(eicOnly)
-View(grpPCA$scores)
+grpPCA <- princomp(forDiet[eicOnly])
+#View(grpPCA$scores)
 pcaTable <- mutate(as.data.frame(grpPCA$scores), grp = factor(cluster$cluster), type = forDiet$type)
 
 a <- ggplot(data = pcaTable) +
@@ -63,14 +65,17 @@ View(cluster$cluster)
 
 
 ggplot(data = theseNuts) +
-  geom_point(mapping = aes(x = Comp.1, y = Comp.2, color = factor(nuts)))
+  geom_point(mapping = aes(x = Comp.1, y = Comp.2, color = factor(nuts))) + 
+  ggtitle("These Nuts")
+
+colnames(md)
 
 
-temp <- filter(ffqData, complete.cases(ffqData))
-cluster <- runKmeans(temp, colnames(temp), 3)
-pca <- princomp(temp)
-View(temp)
-View(pca$scores)
-View(cluster$cluster)
-tbl <- mutate(as.data.frame(pca$scores), grp = factor(cluster$cluster))
+
+
+
+?pct_change
 ?kmeans
+
+
+

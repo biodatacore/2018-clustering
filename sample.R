@@ -80,7 +80,7 @@ classDiet <- addClassCol(classDiet, 'Ovo', c('eggs'), FALSE)
 classDiet <- addClassCol(classDiet, 'Fish', c('tuna', 'DK_FISH', 'OTH_FISH', 'shrimp'), FALSE)
 classDiet <- addClassCol(classDiet, 'Meat', c('CHIX_SK', 'CHIX_NO', 'bacon', 'hotdog', 'PROC_MTS', 'liver', 'hamb', 'SAND_BF', 'beef'), FALSE)
 
-classDiet <- mutate(classDiet, classification = (Dairy == 'Normal') + (Ovo == 'Normal') * 2 + (Fish == 'Normal') * 4 + (Meat == 'Normal') * 8)
+classDiet <- mutate(classDiet, classification = (Dairy != 'Low') + (Ovo != 'Low') * 2 + (Fish != 'Low') * 4 + (Meat != 'Low') * 8)
 
 classDiet$classification <- factor(classDiet$classification)
 
@@ -113,7 +113,7 @@ ggplot(data = classDiet) +
 #there are too many classifications of animal products in diet so
 #we remove dairy as a factor as it appears to be the least impactful
 
-tempClass <- mutate(classDiet, classification = (Ovo == 'Normal') + (Fish == 'Normal') * 2 + (Meat == 'Normal') * 4)
+tempClass <- mutate(classDiet, classification = (Ovo != 'Low') + (Fish != 'Low') * 2 + (Meat != 'Low') * 4)
 tempClass$classification <- factor(tempClass$classification)
 
 ggplot(data = tempClass) +
@@ -306,7 +306,7 @@ classDiet <- addClassCol(classDiet, 'Ovo', c('eggs'))
 classDiet <- addClassCol(classDiet, 'Fish', c('tuna', 'DK_FISH', 'OTH_FISH', 'shrimp'))
 classDiet <- addClassCol(classDiet, 'Meat', c('CHIX_SK', 'CHIX_NO', 'bacon', 'hotdog', 'PROC_MTS', 'liver', 'hamb', 'SAND_BF', 'beef'))
 
-classDiet <- mutate(classDiet, classification = (Dairy == 'Normal') + (Ovo == 'Normal') * 2 + (Fish == 'Normal') * 4 + (Meat == 'Normal') * 8)
+classDiet <- mutate(classDiet, classification = (Dairy != 'Low') + (Ovo != 'Low') * 2 + (Fish != 'Low') * 4 + (Meat != 'Low') * 8)
 
 classDiet <- mutate(classDiet, type = ifelse(classification <= 1, 'vegan', ifelse(classification < 8, 'vegetarian', 'omnivore')))
 
@@ -323,6 +323,7 @@ cluster <- runKmeans(using, colnames(using), 4)
 #nutClassGrp <- mutate(nutAndClass, grp = factor(cluster$cluster))
 
 grpPCA <- princomp(using)
+View(grpPCA$scores)
 pcaTable <- mutate(as.data.frame(grpPCA$scores), grp = factor(cluster$cluster), type = nutAndClass$type)
 
 a <- ggplot(data = pcaTable) +

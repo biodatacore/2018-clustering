@@ -8,8 +8,6 @@ pairCors = numeric()
 ct <- 1
 cors <- setNames(data.frame(matrix(ncol = length(eicOnly), nrow = length(foodOnly))), colnames(md)[eicOnly])
 cors <- mutate(cors, food = '', corTotal = 0, numHigh = 0)
-head(cors)
-
 
 for(i in eicOnly){
   for(j in foodOnly){
@@ -17,24 +15,26 @@ for(i in eicOnly){
     temp <- select(md, i, j)
     temp <- filter(temp, complete.cases(temp))
     cors[j - 535, i - 11] <- pairCors[ct] <- cor(temp[1], temp[2])
-    if(pairCors[ct] > .2){
+    if(abs(pairCors[ct]) > .2){
       print(paste(colnames(temp)[1], 'and', colnames(temp)[2], 'are (c, r) (', i, ',', j, ') and have correlation', pairCors[ct], sep = ' '))
     }
     ct <- ct + 1
   }
 }
 
-orderedCors <- pairCors[order(-pairCors)]
-
+orderedCors <- pairCors[order(-abs(pairCors))]
+head(orderedCors)
+View(orderedCors)
 #View(cors)
 
 cors$corTotal <- rowSums(abs(cors[1:grep('food', colnames(cors))-1]))
-cors$numHigh <- rowSums(ifelse((cors[1:grep('food', colnames(cors))-1]) > .2, 1, 0))
+cors$numMed <- rowSums(ifelse( abs((cors[1:grep('food', colnames(cors))-1])) > .2, 1, 0))
+cors$numHigh <- rowSums(ifelse( abs((cors[1:grep('food', colnames(cors))-1])) > .3, 1, 0))
 #View(cors$corTotal)
 #View(select(cors, food, numHigh))
 
-cors <- cors[order(-cors$numHigh), ]
-head(select(cors, food, numHigh))
+cors <- cors[order(-cors$numMed), ]
+head(select(cors, food, numMed, numHigh))
 
 
 #results, cuz it takes so long to run
@@ -97,6 +97,13 @@ head(select(cors, food, numHigh))
 # [1] "mzid_368.224901_6.5171 and milk are columns ( 511 , 537 ) and have correlation 0.32228330351842"
 
 
+# [1] "mzid_606.283867_4.5146 and total fish are (c, r) ( 160 , 661 ) and have correlation 0.25722534075285"
+# [1] "mzid_331.246878_3.2601 and total fish are (c, r) ( 265 , 661 ) and have correlation 0.224061299943633"
+# [1] "mzid_343.226243_4.3057 and total fish are (c, r) ( 409 , 661 ) and have correlation 0.215111084249936"
+# [1] "mzid_345.242983_5.9250 and total fish are (c, r) ( 425 , 661 ) and have correlation 0.219217415224351"
+
+
+
 #put the highest correlation variables in a regression
 
 ggplot(data = md) +
@@ -107,7 +114,104 @@ ggplot(data = md) +
 
 skrrrahh(16)
 
+summary(lm(mzid_445.227362_3.4312 ~ beer + AGE8 + SEX, data = md))
+summary(lm(mzid_445.227362_3.4312 ~ beer, data = md))
+
+fishCor <- md
+fishCor <- mutate(fishCor, totFish = tuna + DK_FISH + OTH_FISH)
+fishCors = numeric(); ct <- 1
+
+for(i in eicOnly){
+  temp <- select(fishCor, i, 'totFish')
+  temp <- filter(temp, complete.cases(temp))
+  fishCors[ct] <- cor(temp[1], temp[2])
+  if(fishCors[ct] > .2){
+    print(paste(colnames(temp)[1], '(col', i, ') and total fish have correlation', fishCors[ct], sep = ' '))
+  }
+  ct <- ct + 1
+}
+
+
+
+rdCor <- md
+rdCor <- mutate(rdCor, totRed = bacon + hotdog + PROC_MTS + liver + hamb + SAND_BF + beef)
+rdCors = numeric(); ct <- 1
+
+for(i in eicOnly){
+  temp <- select(rdCor, i, 'totRed')
+  temp <- filter(temp, complete.cases(temp))
+  rdCors[ct] <- cor(temp[1], temp[2])
+  if(rdCors[ct] > .2){
+    print(paste(colnames(temp)[1], '(col', i, ') and total red meat have correlation', rdCors[ct], sep = ' '))
+  }
+  ct <- ct + 1
+}
+
+orderedRedCors <- rdCors[order(-abs(rdCors))]
+head(orderedRedCors)
+
+
+
+nutCor <- md
+nutCors = numeric(); ct <- 1
+
+for(i in eicOnly){
+  temp <- select(nutCor, i, 'nuts')
+  temp <- filter(temp, complete.cases(temp))
+  nutCors[ct] <- cor(temp[1], temp[2])
+  if(abs(nutCors[ct]) > .2){
+    print(paste(colnames(temp)[1], '(col', i, ') and these nuts have correlation', nutCors[ct], sep = ' '))
+  }
+  ct <- ct + 1
+}
+
+theseNutCors <- nutCors[order(-abs(nutCors))]
+head(theseNutCors)
+
+
+
+starchCor <- md
+starchCor <- mutate(starchCor, totStarch = COLD_CER + CKD_OATS + CKD_CER + WH_BR + 
+                      DK_BR + ENG_MUFF + muff + BR_RICE + WH_RICE + pasta + grains + pancake + FF_POT + MASH_POT + POT_CHIP + crax + pizza)
+starchCors = numeric(); ct <- 1
+
+for(i in eicOnly){
+  temp <- select(starchCor, i, 'totStarch')
+  temp <- filter(temp, complete.cases(temp))
+  starchCors[ct] <- cor(temp[1], temp[2])
+  if(abs(starchCors[ct]) > .2){
+    print(paste(colnames(temp)[1], '(col', i, ') and total starch have correlation', starchCors[ct], sep = ' '))
+  }
+  ct <- ct + 1
+}
+
+orderedStarchCor <- starchCors[order(-abs(starchCors))]
+head(orderedStarchCor)
+
+
+
+sweetsCor <- md
+sweetsCor <- mutate(sweetsCor, totSweet = choc + candynut + candy + COOX_HOM + COOX_COM + brownie + donut + CAKE_HOM + CAKE_COM + 
+                      S_ROLL_H + S_ROLL_C + PIE_HOME + PIE_COMM + jam + P_BU)
+sweetsCors = numeric(); ct <- 1
+
+for(i in eicOnly){
+  temp <- select(sweetsCor, i, 'totSweet')
+  temp <- filter(temp, complete.cases(temp))
+  sweetsCors[ct] <- cor(temp[1], temp[2])
+  if(abs(sweetsCors[ct]) > .2){
+    print(paste(colnames(temp)[1], '(col', i, ') and total sweets have correlation', sweetsCors[ct], sep = ' '))
+  }
+  ct <- ct + 1
+}
+
+orderedSweetsCor <- sweetsCors[order(-abs(sweetsCors))]
+head(orderedSweetsCor)
+
+
+
 ?cor
+?abs
 ?order
 ?log
 ?kmeans
