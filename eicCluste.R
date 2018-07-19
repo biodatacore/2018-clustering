@@ -1,9 +1,10 @@
-colnames(md)
-grep('points', colnames(md))
-grep('numID', colnames(md))
+start_eic <- grep('mzid_231.176117_1.8182', colnames(md))
+end_eic <- grep('mzid_395.241335_2.6439', colnames(md))
+start_ffq <- grep('skim', colnames(md))
+end_ffq <- grep('S_SHAKE', colnames(md))
 
-eicOnly <- 12:534
-dietOnly <- 536:661
+eicOnly <- start_eic:end_eic
+foodOnly <- start_ffq:end_ffq
 
 pcauEicOnly4c <- kmeansAndPca(md[eicOnly], colnames(md)[eicOnly], FALSE, 4)
 pcasEicOnly5c <- kmeansAndPca(md[eicOnly], colnames(md)[eicOnly], TRUE, 5)

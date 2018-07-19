@@ -90,7 +90,7 @@ transformFFQ <- function(data){
              'fatbpt', 'oilpt', 'mpt', 'sugpt', 'cerpt', 'fl', 'cer', 'oil')
   ffqData <- ffqData[ , -which(names(ffqData) %in% blank)]
   
-  print(ffqData$tofu)
+  #print(ffqData$tofu)
   
   ffqData[ffqData == 1] <- 1/60
   ffqData[ffqData == 2] <- 1/15
@@ -103,7 +103,7 @@ transformFFQ <- function(data){
   ffqData[ffqData == 9] <- 7
   ffqData[ffqData == 10] <- NA
   
-  print(ffqData$tofu)
+  #print(ffqData$tofu)
   
   ffqData$ID = data$id
   ffqData
