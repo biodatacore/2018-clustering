@@ -6,10 +6,11 @@ end_ffq <- grep('S_SHAKE', colnames(md))
 eicOnly <- start_eic:end_eic
 foodOnly <- start_ffq:end_ffq
 
-pcauEicOnly4c <- kmeansAndPca(md[eicOnly], colnames(md)[eicOnly], FALSE, 4)
+pcauEicOnly4c <- kmeansAndPca(md[eicOnly], colnames(md)[eicOnly], FALSE, 4) #WOAH
 pcasEicOnly5c <- kmeansAndPca(md[eicOnly], colnames(md)[eicOnly], TRUE, 5)
 
-pcauEicOnly4c
+cont <- pcaContribution(pcauEicOnly4c)
+head(cont)
 
 temp <- pcaContribution(pcasEicOnly5c)
 head(temp)
@@ -38,7 +39,6 @@ forDiet <- mutate(forDiet, type = ifelse(classification <= 1, 'vegan', ifelse(cl
 
 
 eicCluster <- runKmeans(forDiet[eicOnly], colnames(forDiet)[eicOnly], 4)
-complete.cases(forDiet[eicOnly])
 dietCluster <- runKmeans(forDiet[dietOnly], colnames(forDiet)[dietOnly], 4)
 
 grpPCA <- princomp(forDiet[eicOnly])

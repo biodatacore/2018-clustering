@@ -165,17 +165,18 @@ head(eicCors)
 
 
 bCoeffs <- setNames(data.frame(matrix(ncol = length(eicOnly), nrow = length(foodOnly))), colnames(md)[eicOnly])
-bCoeffs <- mutate(bCoeffs, food = '', corTotal = 0, numHigh = 0)
 
 for(i in eicOnly){
   for(j in foodOnly){
-    bCoeffs[j - start_ffq + 1, 'food'] <- colnames(md)[j]
+    #bCoeffs[j - start_ffq + 1, 'food'] <- colnames(md)[j]
     sformula <- paste(colnames(md)[i], '~', colnames(md)[j], '+ AGE8 + SEX + BMI8 + SBP8')
     bCoeffs[j - start_ffq + 1, i - start_eic + 1] <- lm(sformula, data = md)$coefficients[2]
   }
 }
 
-
+head(bCoeffs)
+superheat(bCoeffs)
+min(bCoeffs)
 
 
 colnames(md)[618]
