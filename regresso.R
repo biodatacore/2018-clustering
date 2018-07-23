@@ -63,9 +63,6 @@ eicCors <- eicCors[order(-strtoi(eicCors$NumHigh), -strtoi(eicCors$NumMed)), ]
 head(eicCors)
 
 
-View(eicCors)
-
-
 
 #results, cuz it takes so long to run
 # [1] "mzid_395.278869_5.3755 and donut are columns ( 32 , 643 ) and have correlation 0.213758921896026"
@@ -167,11 +164,23 @@ View(eicCors)
 # [1] "logt mzid_389.197724_2.2519 and coff are (c, r) ( 522 , 635 ) and have correlation 0.224116929496561"
 
 
-# [1] "mzid_606.283867_4.5146 and total fish are (c, r) ( 160 , 661 ) and have correlation 0.25722534075285"
-# [1] "mzid_331.246878_3.2601 and total fish are (c, r) ( 265 , 661 ) and have correlation 0.224061299943633"
-# [1] "mzid_343.226243_4.3057 and total fish are (c, r) ( 409 , 661 ) and have correlation 0.215111084249936"
-# [1] "mzid_345.242983_5.9250 and total fish are (c, r) ( 425 , 661 ) and have correlation 0.219217415224351"
+bCoeffs <- setNames(data.frame(matrix(ncol = length(eicOnly), nrow = length(foodOnly))), colnames(md)[eicOnly])
+bCoeffs <- mutate(bCoeffs, food = '', corTotal = 0, numHigh = 0)
 
+for(i in eicOnly){
+  for(j in foodOnly){
+    bCoeffs[j - start_ffq + 1, 'food'] <- colnames(md)[j]
+    sformula <- paste(colnames(md)[i], '~', colnames(md)[j], '+ AGE8 + SEX + BMI8 + SBP8')
+    bCoeffs[j - start_ffq + 1, i - start_eic + 1] <- lm(sformula, data = md)$coefficients[2]
+  }
+}
+
+
+
+
+colnames(md)[618]
+skrrrahh(16)
+?lm
 
 
 #put the highest correlation variables in a regression
@@ -187,6 +196,13 @@ summary(lm(mzid_445.227362_3.4312 ~ beer + AGE8 + SEX + BMI8 + SBP8, data = md))
 summary(lm(mzid_445.227362_3.4312 ~ beer, data = md))
 summary(lm(mzid_341.207620_6.4727 ~ ALF_SPRT, data = md))
 
+temp <- lm(mzid_445.227362_3.4312 ~ beer, data = md)
+summary(temp)
+temp$coefficients[2]
+
+
+#Run foood group correlations with eicosanoids
+
 fishCor <- md
 fishCor <- mutate(fishCor, totFish = tuna + DK_FISH + OTH_FISH)
 fishCors = numeric(); ct <- 1
@@ -196,12 +212,22 @@ for(i in eicOnly){
   temp <- filter(temp, complete.cases(temp))
   fishCors[ct] <- cor(temp[1], temp[2])
   if(fishCors[ct] > .2){
-    print(paste(colnames(temp)[1], '(col ', i, ') and total fish have correlation', fishCors[ct], sep = ' '))
+    print(paste('logt', colnames(temp)[1], '(col ', i, ') and total fish have correlation', fishCors[ct], sep = ' '))
   }
   ct <- ct + 1
 }
 
-?glue
+# [1] "mzid_606.283867_4.5146 and total fish are (c, r) ( 160 , 661 ) and have correlation 0.25722534075285"
+# [1] "mzid_331.246878_3.2601 and total fish are (c, r) ( 265 , 661 ) and have correlation 0.224061299943633"
+# [1] "mzid_343.226243_4.3057 and total fish are (c, r) ( 409 , 661 ) and have correlation 0.215111084249936"
+# [1] "mzid_345.242983_5.9250 and total fish are (c, r) ( 425 , 661 ) and have correlation 0.219217415224351"
+# [1] "logt mzid_606.283867_4.5146 (col  164 ) and total fish have correlation 0.263091524898266"
+# [1] "logt mzid_606.284422_4.6675 (col  165 ) and total fish have correlation 0.20329810379397"
+# [1] "logt mzid_291.194445_4.3834 (col  177 ) and total fish have correlation 0.202966658851532"
+# [1] "logt mzid_317.214641_4.9914 (col  296 ) and total fish have correlation 0.216905133857688"
+# [1] "logt mzid_343.226243_4.3057 (col  413 ) and total fish have correlation 0.238015949804031"
+# [1] "logt mzid_345.242983_5.9250 (col  429 ) and total fish have correlation 0.242615549961236"
+# [1] "logt mzid_273.186598_5.5421 (col  438 ) and total fish have correlation 0.202934837513346"
 
 rdCor <- md
 rdCor <- mutate(rdCor, totRed = bacon + hotdog + PROC_MTS + liver + hamb + SAND_BF + beef)
@@ -212,14 +238,13 @@ for(i in eicOnly){
   temp <- filter(temp, complete.cases(temp))
   rdCors[ct] <- cor(temp[1], temp[2])
   if(rdCors[ct] > .2){
-    print(paste(colnames(temp)[1], '(col', i, ') and total red meat have correlation', rdCors[ct], sep = ' '))
+    print(paste('logt', colnames(temp)[1], '(col', i, ') and total red meat have correlation', rdCors[ct], sep = ' '))
   }
   ct <- ct + 1
 }
 
 orderedRedCors <- rdCors[order(-abs(rdCors))]
 head(orderedRedCors)
-
 
 
 nutCor <- md
@@ -230,7 +255,7 @@ for(i in eicOnly){
   temp <- filter(temp, complete.cases(temp))
   nutCors[ct] <- cor(temp[1], temp[2])
   if(abs(nutCors[ct]) > .2){
-    print(paste(colnames(temp)[1], '(col', i, ') and these nuts have correlation', nutCors[ct], sep = ' '))
+    print(paste('logt', colnames(temp)[1], '(col', i, ') and these nuts have correlation', nutCors[ct], sep = ' '))
   }
   ct <- ct + 1
 }
@@ -250,7 +275,7 @@ for(i in eicOnly){
   temp <- filter(temp, complete.cases(temp))
   starchCors[ct] <- cor(temp[1], temp[2])
   if(abs(starchCors[ct]) > .2){
-    print(paste(colnames(temp)[1], '(col', i, ') and total starch have correlation', starchCors[ct], sep = ' '))
+    print(paste('logt', colnames(temp)[1], '(col', i, ') and total starch have correlation', starchCors[ct], sep = ' '))
   }
   ct <- ct + 1
 }
@@ -270,7 +295,7 @@ for(i in eicOnly){
   temp <- filter(temp, complete.cases(temp))
   sweetsCors[ct] <- cor(temp[1], temp[2])
   if(abs(sweetsCors[ct]) > .2){
-    print(paste(colnames(temp)[1], '(col', i, ') and total sweets have correlation', sweetsCors[ct], sep = ' '))
+    print(paste('logt', colnames(temp)[1], '(col', i, ') and total sweets have correlation', sweetsCors[ct], sep = ' '))
   }
   ct <- ct + 1
 }
