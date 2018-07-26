@@ -142,7 +142,7 @@ nutrientData <- filter(nutrientData, complete.cases(nutrientData))
 
 #unscaled k means
 
-pcaunut4c <- kmeansAndPca(nutrientData, colnames(nutrientData), FALSE, 4)
+pcaunut4c <- kmeansAndPca(nutrientData, FALSE, 4)
 #pca$loadings
 
 # fviz_eig(pca)
@@ -163,7 +163,7 @@ pcaunut4c <- kmeansAndPca(nutrientData, colnames(nutrientData), FALSE, 4)
 
 
 #k means with nutrientdata scaled
-pcasnut4c <- kmeansAndPca(nutrientData, colnames(nutrientData), TRUE, 4)
+pcasnut4c <- kmeansAndPca(nutrientData, TRUE, 4)
 
 # summary(pcale)
 # eigs <- pcale$sdev^2
@@ -179,7 +179,7 @@ pcasnut4c <- kmeansAndPca(nutrientData, colnames(nutrientData), TRUE, 4)
 noCal <- nutrientData
 noCal$totcal <- NULL
 
-pcaunoCal4c <- kmeansAndPca(noCal, colnames(noCal), FALSE, 4)
+pcaunoCal4c <- kmeansAndPca(noCal, FALSE, 4)
 
 # summary(pNoCal)
 # eigs <- pNoCal$sdev^2
@@ -193,7 +193,7 @@ pcaunoCal4c <- kmeansAndPca(noCal, colnames(noCal), FALSE, 4)
 noCal <- nutrientData
 noCal$totcal <- NULL
 
-pcasnoCal4c <- kmeansAndPca(noCal, colnames(noCal), TRUE, 4)
+pcasnoCal4c <- kmeansAndPca(noCal, TRUE, 4)
 
 # summary(pcale)
 # eigs <- pcale$sdev^2
@@ -259,8 +259,8 @@ d2 <- noCorData %>%
 
 filter(d2, value > .9 & value != 1)
 
-kmeansAndPca(noCorData, colnames(noCorData), FALSE, 4)
-kmeansAndPca(noCorData, colnames(noCorData), TRUE, 4)
+kmeansAndPca(noCorData, FALSE, 4)
+kmeansAndPca(noCorData, TRUE, 4)
 
 # summary(pca)
 # eigs <- pca$sdev^2
@@ -288,7 +288,7 @@ table(clustercut)
 
 correlation <- as.data.frame(cor(noCorData, method = "spearman"))
 correlation
-kmeansAndPca(correlation, colnames(correlation), FALSE, 4)
+kmeansAndPca(correlation, FALSE, 4)[1]
 
 #turns out clustering on correlation lends some interesting clustering but interpretability is ass
 
@@ -322,7 +322,7 @@ using <- nutAndClass[, -which(names(nutAndClass) %in% c('type'))]
 notUsing <- nutAndClass[, which(names(nutAndClass) %in% c('type'))]
 using <- as.data.frame(scale(using))
 
-cluster <- runKmeans(using, colnames(using), 4)
+cluster <- runKmeans(using, 4)
 #nutClassGrp <- mutate(nutAndClass, grp = factor(cluster$cluster))
 
 grpPCA <- princomp(using)
@@ -346,7 +346,7 @@ grid.arrange(a, b, ncol = 2)
 #lets try running kmeans on pca
 
 
-hold <- pcaAndKmeans(nutrientData, colnames(nutrientData), TRUE, 4)
+hold <- pcaAndKmeans(nutrientData, TRUE, 4)
 
 ggplot(data = data) +
   geom_bar(mapping = aes(x = hamb))
@@ -378,8 +378,8 @@ complete_ffq <- filter(ffqData, complete.cases(ffqData))
 
 colnames(complete_ffq)
 
-pcauffq4c <- kmeansAndPca(complete_ffq, colnames(complete_ffq)[colnames(complete_ffq) != 'ID'], FALSE, 4)
-pcasffq4c <- kmeansAndPca(complete_ffq, colnames(complete_ffq)[colnames(complete_ffq) != 'ID'], TRUE, 4)
+pcauffq4c <- kmeansAndPca(complete_ffq, FALSE, 4, colnames(complete_ffq)[colnames(complete_ffq) != 'ID'])
+pcasffq4c <- kmeansAndPca(complete_ffq, TRUE, 4, colnames(complete_ffq)[colnames(complete_ffq) != 'ID'])
 
 
 #looks kind of interesting lets look at the scores
@@ -405,7 +405,7 @@ table(clustercut)
 
 #yea hierarchical is still fucked, clustering on nonscaled with complete method is the least uninteresting
 
-pcaContribution(kmeansAndPca(complete_ffq, c('P_SHAKE', 'S_SHAKE', 'coff'), TRUE, 4))
+pcaContribution(kmeansAndPca(complete_ffq, c('P_SHAKE', 'S_SHAKE', 'coff'), TRUE, 4)[1])
 
 
 

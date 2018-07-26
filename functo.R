@@ -1,4 +1,4 @@
-pcaAndKmeans <- function(data, cols, scale, numClust){
+pcaAndKmeans <- function(data, scale, numClust, cols = colnames(data)){
   using <- data[, which(names(data) %in% cols)]
   if(scale){
     using <- as.data.frame(as.matrix(scale(using)))
@@ -6,7 +6,7 @@ pcaAndKmeans <- function(data, cols, scale, numClust){
   
   pca <- princomp(using)
   scores <- as.data.frame(pca$scores)
-  cluster <- runKmeans(scores, c('Comp.1', 'Comp.2', 'Comp.3', 'Comp.4'), numClust)
+  cluster <- runKmeans(scores, numClust, cols = c('Comp.1', 'Comp.2', 'Comp.3', 'Comp.4'),)
   #View(pca$scores)
   tbl <- mutate(scores, grp = factor(cluster$cluster))
   #tbl <- merge(tbl, notUsing)
@@ -17,22 +17,22 @@ pcaAndKmeans <- function(data, cols, scale, numClust){
   #pca
 }
 
-runKmeans <- function(data, cols, clusters){
-  temp <- data[cols]
+runKmeans <- function(data, clusters, cols = colnames(data)){
+  temp <- data[, cols]
   cluster <- kmeans(temp, clusters)
   #print(cluster$centers)
   #print(cluster$withinss)
   cluster
 }
 
-kmeansAndPca <- function(data, cols, scale, numClust){
+kmeansAndPca <- function(data, scale, numClust, cols = colnames(data)){
   using <- data[, which(names(data) %in% cols)]
   if(scale){
     using <- as.data.frame(as.matrix(scale(using)))
   } else{
     using <- using
   }
-  cluster <- runKmeans(using, cols, numClust)
+  cluster <- runKmeans(using, numClust, cols = cols)
   pca <- princomp(using)
   #View(pca$scores)
   tbl <- mutate(as.data.frame(pca$scores), grp = factor(cluster$cluster))
@@ -41,7 +41,7 @@ kmeansAndPca <- function(data, cols, scale, numClust){
   g <- ggplot(data = tbl) +
     geom_point(mapping = aes(x = Comp.1, y = Comp.2, color = grp))
   print(g)
-  pca
+  c(pca, cluster)
 }
 
 vs_Afat <- function(data, col) {
@@ -109,8 +109,8 @@ transformFFQ <- function(data){
   ffqData
 }
 
-tryClust <- function(method, cut){
-  clusters <- hclust(dist(scale(eicOnly)), method = method);
+tryClust <- function(data, method, cut){
+  clusters <- hclust(dist(scale(data)), method = method);
   plot(clusters);
   clustercut <- cutree(clusters, cut);
   table(clustercut)

@@ -6,8 +6,10 @@ end_ffq <- grep('S_SHAKE', colnames(md))
 eicOnly <- start_eic:end_eic
 foodOnly <- start_ffq:end_ffq
 
-pcauEicOnly4c <- kmeansAndPca(md[eicOnly], colnames(md)[eicOnly], FALSE, 4) #WOAH
-pcasEicOnly5c <- kmeansAndPca(md[eicOnly], colnames(md)[eicOnly], TRUE, 5)
+pcauEicOnly4c <- kmeansAndPca(md[eicOnly], FALSE, 4) #WOAH
+pcauEicOnly3c <- kmeansAndPca(md[eicOnly], FALSE, 3) #groups medium left two together most often
+summary(pcauEicOnly4c)
+pcasEicOnly5c <- kmeansAndPca(md[eicOnly], TRUE, 5)
 
 cont <- pcaContribution(pcauEicOnly4c)
 head(cont)
@@ -17,11 +19,11 @@ head(temp)
 temp <- temp[order(-temp$Comp.2), ]
 head(temp)
 
-pcaAndKmeans(md[eicOnly], colnames(md[eicOnly]), FALSE, 5)
+pcaAndKmeans(md[eicOnly], FALSE, 5)
 
-tryClust('complete', 20)
-tryClust('single', 20)
-tryClust('average', 20)
+tryClust(md[eicOnly], 'complete', 20)
+tryClust(md[eicOnly], 'single', 20)
+tryClust(md[eicOnly], 'average', 20)
 
 #going back to roots lets try putting clusters together with classification of diet
 
@@ -38,12 +40,12 @@ forDiet <- mutate(forDiet, classification = (Dairy != 'Low') + (Ovo != 'Low') * 
 forDiet <- mutate(forDiet, type = ifelse(classification <= 1, 'vegan', ifelse(classification < 8, 'vegetarian', 'omnivore')))
 
 
-eicCluster <- runKmeans(forDiet[eicOnly], colnames(forDiet)[eicOnly], 4)
-dietCluster <- runKmeans(forDiet[dietOnly], colnames(forDiet)[dietOnly], 4)
+eicCluster <- runKmeans(forDiet[eicOnly], 4)
+dietCluster <- runKmeans(forDiet[dietOnly], 4)
 
 grpPCA <- princomp(forDiet[eicOnly])
 #View(grpPCA$scores)
-pcaTable <- mutate(as.data.frame(grpPCA$scores), grp = factor(cluster$cluster), type = forDiet$type)
+pcaTable <- mutate(as.data.frame(grpPCA$scores), grp = factor(eicCluster$cluster), type = forDiet$type)
 
 a <- ggplot(data = pcaTable) +
   geom_point(mapping = aes(x = Comp.1, y = Comp.2, color = grp, shape = type))
@@ -60,8 +62,9 @@ grid.arrange(a, b, ncol = 2)
 
 #try plotting and coloring by nuts
 
+eicCluster <- runKmeans(forDiet[eicOnly], 4)
 theseNuts <- as.data.frame(pcauEicOnly4c$scores)
-theseNuts <- mutate(theseNuts, nuts = forDiet$nuts, grp = cluster$cluster)
+theseNuts <- mutate(theseNuts, nuts = forDiet$nuts, grp = eicCluster$cluster)
 View(cluster$cluster)
 
 
