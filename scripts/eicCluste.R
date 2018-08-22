@@ -1,3 +1,5 @@
+library(gridExtra)
+
 start_eic <- grep('mzid_231.176117_1.8182', colnames(md))
 end_eic <- grep('mzid_395.241335_2.6439', colnames(md))
 start_ffq <- grep('skim', colnames(md))
@@ -41,7 +43,7 @@ forDiet <- mutate(forDiet, type = ifelse(classification <= 1, 'vegan', ifelse(cl
 
 
 eicCluster <- runKmeans(forDiet[eicOnly], 4)
-dietCluster <- runKmeans(forDiet[dietOnly], 4)
+foodCluster <- runKmeans(forDiet[foodOnly], 4)
 
 grpPCA <- princomp(forDiet[eicOnly])
 #View(grpPCA$scores)
@@ -65,14 +67,14 @@ grid.arrange(a, b, ncol = 2)
 eicCluster <- runKmeans(forDiet[eicOnly], 4)
 theseNuts <- as.data.frame(pcauEicOnly4c$scores)
 theseNuts <- mutate(theseNuts, nuts = forDiet$nuts, grp = eicCluster$cluster)
-View(cluster$cluster)
+#View(cluster$cluster)
 
 
 ggplot(data = theseNuts) +
   geom_point(mapping = aes(x = Comp.1, y = Comp.2, color = factor(nuts))) + 
   ggtitle("These Nuts")
 
-colnames(md)
+#colnames(md)
 
 
 

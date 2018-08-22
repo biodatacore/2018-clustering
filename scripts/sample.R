@@ -1,20 +1,4 @@
-library(dplyr)
-library(tidyverse)
-library(factoextra)
-#library(cluster)
-library(tibble)
 library(gridExtra)
-library(varhandle)
-library(superheat)
-library(BRRR)
-library(ggplot2)
-
-getwd()
-setwd('/Users/krao/Dropbox/2018 Applied Bioinformatics Work/Personal Folders/Kevin Rao')
-
-data <- read.csv('sample.csv')
-colnames(data)
-#View(data)
 
 trimMilk <- select(data, skim, milk, ca, cadur, cad)
 validMilk <- filter(trimMilk, skim > 0, skim < 10, milk > 0, milk < 10)
@@ -103,8 +87,9 @@ cals <- vs_Class('totcal')
 chol <- vs_Class('NUT_CHOLINE')
 vs_Class('NUT_CHOL')
 
-grid.arrange(afat, copper, cals, chol, ncol = 2)
+View(data$totcal)
 
+grid.arrange(afat, copper, cals, chol, ncol = 2)
 
 ggplot(data = classDiet) +
   geom_boxplot(mapping = aes(x = classification, y = NUT_AFAT))
@@ -326,7 +311,7 @@ cluster <- runKmeans(using, 4)
 #nutClassGrp <- mutate(nutAndClass, grp = factor(cluster$cluster))
 
 grpPCA <- princomp(using)
-View(grpPCA$scores)
+#View(grpPCA$scores)
 pcaTable <- mutate(as.data.frame(grpPCA$scores), grp = factor(cluster$cluster), type = nutAndClass$type)
 
 a <- ggplot(data = pcaTable) +
@@ -404,8 +389,6 @@ clustercut <- cutree(clusters, 20)
 table(clustercut)
 
 #yea hierarchical is still fucked, clustering on nonscaled with complete method is the least uninteresting
-
-pcaContribution(kmeansAndPca(complete_ffq, c('P_SHAKE', 'S_SHAKE', 'coff'), TRUE, 4)[1])
 
 
 

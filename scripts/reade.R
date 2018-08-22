@@ -1,5 +1,3 @@
-library(dplyr)
-library(tidyverse)
 library(readxl)
 
 getwd()
@@ -26,7 +24,7 @@ eics <-
 
 eic_data <- 
   fhs$metabolites$data %>% 
-  dplyr::select(plate, well, plate_well, one_of(eics))
+  select(plate, well, plate_well, one_of(eics))
 
 #colnames(eic_data)
 
@@ -34,7 +32,7 @@ eic_data <-
 
 clin <-
   fhs$clinical %>% 
-  dplyr::select(ID, SEX, AGE8, chd, hardchd, hxhardcvd, chdtime, points, BMI8, BG8, SBP8, CURRSMK8, curr_diab8, TC8)
+  select(ID, SEX, AGE8, chd, hardchd, hxhardcvd, chdtime, points, BMI8, BG8, SBP8, CURRSMK8, curr_diab8, TC8)
 
 #colnames(clin)
 
@@ -48,7 +46,7 @@ fhs$id <- fhs$id[order(fhs$id$ID), ]
 mergeEicId <- left_join(eic_data, fhs$id, by = c('plate_well' = 'Plate_Position'))
 mergeClin <- left_join(mergeEicId, clin, by = 'ID')
 
-md <- dplyr::select(mergeClin, ID, plate, well, plate_well, one_of(names(clin)), everything())
+md <- select(mergeClin, ID, plate, well, plate_well, one_of(names(clin)), everything())
 md <- mutate(md, SEX = replace(SEX, which(md$SEX == 2), 0))
 
 
@@ -82,13 +80,13 @@ md <-
 
 
 ffqData <- transformFFQ(data)
-dataWithId <- filter(ffqData, !is.na(ffqData$ID))
+dataWithId <- filter(ffqData, !is.na(ffqData$id))
 
 md <- filter(md, nchar(ID) == 6)
 
 md <- mutate(md, numID = strtoi(substr(ID, 3, 6), base = 10))
 
-md <- left_join(md, dataWithId, by = c('numID' = 'ID'))
+md <- left_join(md, dataWithId, by = c('numID' = 'id'))
 #colnames(md)
 #confirm that the match is correct somehow
 
@@ -111,7 +109,8 @@ md <-
   md %>% 
   mutate_at(foodOnly, foodImputer)
 
-
+md <- mutate_at(md, grep('totcal', colnames(md)), function(x){x[is.na(x)] <- 100; return(x)})
+md <- computeHEI(md)
 
 ?setwd
 ?read_excel

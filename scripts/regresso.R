@@ -1,4 +1,4 @@
-source('functo.R')
+
 
 start_eic <- grep('mzid_231.176117_1.8182', colnames(md))
 end_eic <- grep('mzid_395.241335_2.6439', colnames(md))
@@ -16,9 +16,9 @@ cors <- mutate(cors, food = '', corTotal = 0, numHigh = 0)
 for(i in eicOnly){
   for(j in foodOnly){
     cors[j - start_ffq + 1, 'food'] <- colnames(md)[j]
-    temp <- dplyr::select(md, i, j)
+    temp <- select(md, i, j)
     temp <- filter(temp, complete.cases(temp))
-    cors[j - start_ffq + 1, i - start_eic + 1] <- pairCors[ct] <- round(cor(temp[1], temp[2]), digits = 3)
+    cors[j - start_ffq + 1, i - start_eic + 1] <- pairCors[ct] <- round(cor(temp[1], temp[2]), digits = 4)
     if(abs(pairCors[ct]) > .2){
       print(paste('logt', colnames(temp)[1], 'and', colnames(temp)[2], 'are (c, r) (', i, ',', j, ') and have correlation', pairCors[ct], sep = ' '))
     }
@@ -38,7 +38,7 @@ cors$numMed <- rowSums(ifelse( abs((cors[1:grep('food', colnames(cors))-1])) > .
 cors$numHigh <- rowSums(ifelse( abs((cors[1:grep('food', colnames(cors))-1])) > .3, 1, 0))
 
 cors <- cors[order(-cors$numHigh, -cors$numMed), ]
-head(dplyr::select(cors, food, numMed, numHigh))
+head(select(cors, food, numMed, numHigh))
 
 
 eicCors <- setNames(data.frame(matrix(ncol = 3, nrow = 0)), c('Eicosanoid', 'NumMed', 'NumHigh'))
@@ -162,6 +162,23 @@ head(eicCors)
 # [1] "logt mzid_363.253595_6.0788 and POT_CHIP are (c, r) ( 501 , 626 ) and have correlation 0.204"
 # [1] "logt mzid_389.197724_2.2519 and coff are (c, r) ( 524 , 637 ) and have correlation 0.22"
 
+
+#Gonna sort and use adj_cors instead and see what happens
+
+sigCor <- as.data.frame(matrix(nrow = 10, ncol = 3)); rowct <- 1
+colnames(sigCor) <- c('Eic', 'Food Item', 'Correlation')
+
+for(i in 1:nrow(adj_cors)){
+  for(j in 1:ncol(adj_cors)){
+    if(abs(adj_cors[i, j]) >= .2){
+      print(paste(colnames(adj_cors)[j], 'and', rownames(adj_cors)[i], 'have correlation', round(adj_cors[i, j], digits = 4)))
+      sigCor[rowct, ] <- c(colnames(adj_cors)[j], rownames(adj_cors)[i], adj_cors[i, j])
+      rowct <- rowct + 1
+    }
+  }
+}
+sigCor$Correlation <- as.double(sigCor$Correlation)
+sigCor <- sigCor[order(-abs(sigCor$Correlation)), ]
 
 
 ?cor
