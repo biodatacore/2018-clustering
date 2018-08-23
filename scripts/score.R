@@ -1,3 +1,13 @@
+md <- readRDS('data/md.rds')
+
+start_eic <- grep('mzid_231.176117_1.8182', colnames(md))
+end_eic <- grep('mzid_395.241335_2.6439', colnames(md))
+start_ffq <- grep('skim', colnames(md))
+end_ffq <- grep('S_SHAKE', colnames(md))
+
+eicOnly <- start_eic:end_eic
+foodOnly <- start_ffq:end_ffq
+
 
 HEICorBeta <- matrix(nrow = ncol(md[eicOnly]), ncol = 2)
 rownames(HEICorBeta) <- names(md[eicOnly])
@@ -10,8 +20,7 @@ sortedHEI <- sortedHEI[order(-abs(sortedHEI$Correlation)), ]
 
 View(sortedHEI)
 
-ggplot(data = md) + 
-  geom_point(mapping = aes(x = HEI, y = mzid_606.284422_4.6675))
+saveRDS(sortedHEI, 'correlations/heiCorBeta.rds')
 
 
 

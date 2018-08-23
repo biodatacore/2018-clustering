@@ -1,4 +1,4 @@
-
+md <- readRDS('data/md.rds')
 
 start_eic <- grep('mzid_231.176117_1.8182', colnames(md))
 end_eic <- grep('mzid_395.241335_2.6439', colnames(md))
@@ -179,6 +179,8 @@ for(i in 1:nrow(adj_cors)){
 }
 sigCor$Correlation <- as.double(sigCor$Correlation)
 sigCor <- sigCor[order(-abs(sigCor$Correlation)), ]
+
+saveRDS(sigCor, 'correlations/sigCor.rds')
 
 
 ?cor

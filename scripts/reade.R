@@ -1,17 +1,10 @@
 library(readxl)
 
-getwd()
-setwd('/Users/krao/Dropbox (Partners HealthCare)/Susan-Mir Shared/Eicosanoids-FS-CODE/eicdata/FHS')
-
-clinicData <- read_excel('FHS_Mir_Corrected_df16_Progenesis_eic_only.xlsx')
-idKey <- read_excel('fhs_ex8_platepos_id_key.xls')
-ffqData <- read.csv('/Users/krao/Dropbox (Partners HealthCare)/2018 Applied Bioinformatics Work/Personal folders/Kevin Rao/temp data/ffq ex8 for kr.csv')
-setwd('/Users/krao/Dropbox/2018 Applied Bioinformatics Work/Personal Folders/Kevin Rao')
-data <- read.csv('sample.csv')
-
-
-
-fhs <- readRDS('/Users/krao/Dropbox (Partners HealthCare)/2018 Applied Bioinformatics Work/Personal folders/Kevin Rao/fhs.rds')
+clinicData <- read_excel('data/FHS_Mir_Corrected_df16_Progenesis_eic_only.xlsx')
+idKey <- read_excel('data/fhs_ex8_platepos_id_key.xls')
+ffqData <- read.csv('data/ffq_ex8_for_kr.csv')
+data <- read.csv('data/sample.csv')
+fhs <- readRDS('data/fhs.rds')
 
 
 # Filter to Eicosanoids ---------------------------------------------------
@@ -112,8 +105,7 @@ md <-
 md <- mutate_at(md, grep('totcal', colnames(md)), function(x){x[is.na(x)] <- 100; return(x)})
 md <- computeHEI(md)
 
-?setwd
-?read_excel
-?left_join
-?one_of
-?log
+
+
+saveRDS(md, 'data/md.rds')
+

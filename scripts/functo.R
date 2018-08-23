@@ -163,6 +163,10 @@ runPcor <- function(data, array){ #runs pcor between all the columns in data and
 
 
 runBCoeffs <- function(data, arrayName){
+  start_eic <- grep('mzid_231.176117_1.8182', colnames(data))
+  end_eic <- grep('mzid_395.241335_2.6439', colnames(data))
+  eicOnly <- start_eic:end_eic
+  
   posi <- 1
   result <- numeric()
   for(i in eicOnly){ # written super specifically for a data frame with all columns except the last being eicosanoids and the last being vegan, vegetarian, or pescetarian
@@ -222,6 +226,24 @@ heiHelper <- function(totcal, array, max, mult, scale = 1000){
   #print(head(totcal))
   #print('lmfao')
   score
+}
+
+corFoodGroup <- function(data, grpName){
+  start_eic <- grep('mzid_231.176117_1.8182', colnames(data))
+  end_eic <- grep('mzid_395.241335_2.6439', colnames(data))
+  eicOnly <- start_eic:end_eic
+  
+  results <- as.data.frame(matrix(nrow = 0, ncol = 3)); rowct <- 1
+  colnames(results) <- c('Eic', 'Food Group', 'Correlation')
+  
+  for(i in eicOnly){
+    val <- round(cor(data[i], data[[grpName]], method = 'spearman'), digits = 4)
+    if(val > .2){
+      print(paste('logt', colnames(data)[i], '(col', i, ') and', grpName, 'have cor', val, sep = ' '))
+    }
+    results[rowct, ] <- c(colnames(data)[i], grpName, val); rowct <- rowct + 1
+  }
+  results
 }
 
 ?min

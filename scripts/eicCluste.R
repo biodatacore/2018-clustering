@@ -1,5 +1,7 @@
 library(gridExtra)
 
+md <- readRDS('data/md.rds')
+
 start_eic <- grep('mzid_231.176117_1.8182', colnames(md))
 end_eic <- grep('mzid_395.241335_2.6439', colnames(md))
 start_ffq <- grep('skim', colnames(md))
@@ -8,9 +10,11 @@ end_ffq <- grep('S_SHAKE', colnames(md))
 eicOnly <- start_eic:end_eic
 foodOnly <- start_ffq:end_ffq
 
+pdf('plots/eicClusters.pdf', width = 7, height = 7)
+
+
 pcauEicOnly4c <- kmeansAndPca(md[eicOnly], FALSE, 4) #WOAH
 pcauEicOnly3c <- kmeansAndPca(md[eicOnly], FALSE, 3) #groups medium left two together most often
-summary(pcauEicOnly4c)
 pcasEicOnly5c <- kmeansAndPca(md[eicOnly], TRUE, 5)
 
 cont <- pcaContribution(pcauEicOnly4c)
@@ -76,7 +80,7 @@ ggplot(data = theseNuts) +
 
 #colnames(md)
 
-
+dev.off()
 
 
 
